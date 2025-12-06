@@ -233,26 +233,25 @@
       z-index: 2;
     }
 
-    /* photo column – no rotation, scrollable, overlaps slightly */
+    /* photo area – right stack on desktop, strip on mobile */
     #photo-layer {
       position: fixed;
-      top: 90px;
-      right: 10px;
-      bottom: 90px;
+      top: 100px;
+      right: 16px;
+      bottom: 80px;
       width: min(260px, 40vw);
       display: flex;
       flex-direction: column;
       align-items: flex-end;
       overflow-y: auto;
-      overflow-x: visible;
-      gap: 0;
+      overflow-x: hidden;
+      gap: 12px;
       padding-right: 4px;
       pointer-events: auto;
       z-index: 1;  /* behind main text but above snow */
     }
 
     .photo-frame {
-      position: relative;
       border-radius: 18px;
       background-size: cover;
       background-position: center;
@@ -260,31 +259,29 @@
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.65);
       opacity: 0.95;
       cursor: pointer;
-      margin-bottom: -40px; /* overlap stack */
-      transform: translateX(0);
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
     }
 
     .photo-frame:hover {
-      transform: translateX(-6px);
-      box-shadow: 0 16px 35px rgba(0,0,0,0.9);
+      transform: scale(1.06);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.95);
       z-index: 2;
     }
 
-    /* enlarged sizes */
-    .size-sm { width: 110px; height: 110px; }
+    /* sizes */
+    .size-sm { width: 120px; height: 120px; }
     .size-md { width: 170px; height: 170px; }
-    .size-lg { width: 240px; height: 240px; }
+    .size-lg { width: 230px; height: 230px; }
 
-    /* upload button bottom-left */
+    /* upload button – top right */
     .upload-btn {
       position: fixed;
-      bottom: 70px;
-      left: 18px;
-      z-index: 4;
-      background: rgba(15, 23, 42, 0.9);
+      top: 18px;
+      right: 18px;
+      z-index: 5;
+      background: rgba(15, 23, 42, 0.92);
       border-radius: 999px;
-      padding: 8px 14px;
+      padding: 7px 13px;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -312,7 +309,7 @@
       .layout {
         align-items: flex-start;
         min-height: calc(100vh - 140px);
-        padding-bottom: 110px; /* more room for ribbon + button */
+        padding-bottom: 110px; /* more room for ribbon */
       }
       .text-panel {
         max-width: 100%;
@@ -321,40 +318,40 @@
       .sub { font-size: 13px; }
       .frame-text { font-size: 12px; }
 
-      /* photo strip at bottom with horizontal scroll, overlapping */
+      /* photo strip at bottom, horizontal scroll, no overlap */
       #photo-layer {
         position: fixed;
         left: 0;
         right: 0;
         bottom: 110px;
         top: auto;
-        height: 150px;
+        height: 140px;
         width: 100%;
         flex-direction: row;
-        align-items: flex-end;
+        align-items: center;
         justify-content: flex-start;
         overflow-x: auto;
         overflow-y: hidden;
         padding: 0 16px;
-        gap: 0;
+        gap: 12px;
       }
 
       .photo-frame {
-        margin-bottom: 0;
-        margin-right: -36px; /* sideways overlap */
+        flex-shrink: 0;
       }
 
       .upload-btn {
-        bottom: 96px;
-        left: 12px;
+        top: 14px;
+        right: 12px;
         font-size: 12px;
-        padding: 6px 12px;
+        padding: 6px 11px;
       }
       .upload-btn span.icon {
         width: 18px;
         height: 18px;
         font-size: 14px;
       }
+
       .ribbon-wrapper {
         bottom: 34px; /* lift ribbon above browser chrome */
       }
@@ -375,7 +372,7 @@
     }
   </script>
 
-  <!-- stacked / scrolling photos -->
+  <!-- photos -->
   <div id="photo-layer"></div>
 
   <!-- main layout -->
@@ -537,7 +534,7 @@
       }
     }, 180);
 
-    // ---------- Supabase + stacked / scrolling photos ----------
+    // ---------- Supabase + photos ----------
     const SUPABASE_URL = "https://npohhprkgsxudoucaooy.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wb2hocHJrZ3N4dWRvdWNhb295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwNDU2NjAsImV4cCI6MjA4MDYyMTY2MH0.U_TEDQaXfgFlz0Or_3fiIDavFuTKC9mfn0sVcPNqFr4";
     const BUCKET = "xmas-photos";
