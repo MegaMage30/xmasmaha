@@ -213,7 +213,7 @@
       z-index: 2;
     }
 
-    /* floating photo layer */
+    /* floating photo layer (desktop) */
     #photo-layer {
       position: fixed;
       inset: 0;
@@ -229,7 +229,6 @@
       border: 1px solid rgba(255, 255, 255, 0.2);
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.65);
       opacity: 0.95;
-      cursor: default;
       pointer-events: auto;
       /* soft float / bounce */
       animation-name: driftSoft;
@@ -250,7 +249,57 @@
     .size-md { width: 170px; height: 170px; }
     .size-lg { width: 240px; height: 240px; }
 
-    /* upload button – top right on mobile/desktop */
+    /* mobile polaroid collage */
+    .collage {
+      max-width: 480px;
+      margin-top: 26px;
+      display: none; /* desktop default */
+    }
+
+    .polaroid {
+      background: #f9fafb;
+      border-radius: 14px;
+      padding: 10px 10px 14px;
+      box-shadow: 0 14px 30px rgba(0,0,0,0.7);
+      transform-origin: center;
+    }
+
+    .polaroid-photo {
+      width: 100%;
+      height: 230px;
+      background-size: cover;
+      background-position: center;
+      border-radius: 10px;
+      background-color: #111827;
+    }
+
+    .polaroid-caption {
+      margin-top: 6px;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #111827;
+      opacity: 0.7;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .polaroid-caption span.tag {
+      background: transparent;
+      border: none;
+      margin: 0;
+      padding: 0;
+      font-size: 11px;
+      color: #111827cc;
+    }
+
+    /* slight random-ish tilts using nth-child for collage */
+    .collage .polaroid:nth-child(3n+1) { transform: rotate(-3deg) translateX(-4px); }
+    .collage .polaroid:nth-child(3n+2) { transform: rotate(2.5deg) translateX(6px); }
+    .collage .polaroid:nth-child(3n)   { transform: rotate(-1.5deg) translateX(-2px); }
+
+    /* upload button – top right */
     .upload-btn {
       position: fixed;
       top: 14px;
@@ -285,7 +334,7 @@
       }
       .layout {
         align-items: flex-start;
-        min-height: calc(100vh - 140px);
+        min-height: auto;
         padding-bottom: 110px;
       }
       .text-panel {
@@ -294,6 +343,21 @@
       h1 { font-size: 24px; }
       .sub { font-size: 13px; }
       .footer { font-size: 11px; }
+
+      /* hide floating layer on mobile, show collage */
+      #photo-layer {
+        display: none;
+      }
+      .collage {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        padding-bottom: 16px;
+      }
+      .polaroid-photo {
+        height: 260px;
+      }
+
       .upload-btn {
         top: 10px;
         right: 10px;
@@ -325,7 +389,7 @@
     }
   </script>
 
-  <!-- floating photos -->
+  <!-- floating photos (desktop) -->
   <div id="photo-layer"></div>
 
   <!-- main layout -->
@@ -363,6 +427,9 @@
         <span>Made with mild non-chalant love</span>
         <span>– you know who 😌</span>
       </div>
+
+      <!-- mobile polaroid collage area -->
+      <div id="collage" class="collage"></div>
     </div>
   </div>
 
@@ -479,7 +546,7 @@
       }
     }, 180);
 
-    // ---------- Supabase + floating photos ----------
+    // ---------- Supabase + floating photos + collage ----------
     const SUPABASE_URL = "https://npohhprkgsxudoucaooy.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wb2hocHJrZ3N4dWRvdWNhb295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwNDU2NjAsImV4cCI6MjA4MDYyMTY2MH0.U_TEDQaXfgFlz0Or_3fiIDavFuTKC9mfn0sVcPNqFr4";
     const BUCKET = "xmas-photos";
@@ -489,48 +556,68 @@
     const photoLayer = document.getElementById("photo-layer");
     const uploadBtn = document.getElementById("uploadBtn");
     const photoInput = document.getElementById("photoInput");
+    const collage = document.getElementById("collage");
 
     function addPhotoFrame(url) {
-      const div = document.createElement("div");
-      div.classList.add("photo-frame");
+      // floating frame (desktop)
+      if (photoLayer) {
+        const div = document.createElement("div");
+        div.classList.add("photo-frame");
 
-      const sizes = ["size-sm", "size-md", "size-lg"];
-      div.classList.add(sizes[Math.floor(Math.random() * sizes.length)]);
+        const sizes = ["size-sm", "size-md", "size-lg"];
+        div.classList.add(sizes[Math.floor(Math.random() * sizes.length)]);
 
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
 
-      // Desktop: mostly right side; Mobile: more spread
-      let xStart, xWidth;
-      if (vw < 720) {
-        xStart = vw * 0.05;
-        xWidth = vw * 0.9;
-      } else {
-        xStart = vw * 0.25;
-        xWidth = vw * 0.7;
+        let xStart, xWidth;
+        if (vw < 720) {
+          xStart = vw * 0.05;
+          xWidth = vw * 0.9;
+        } else {
+          xStart = vw * 0.25;
+          xWidth = vw * 0.7;
+        }
+
+        let yStart, yHeight;
+        if (vh < 700) {
+          yStart = vh * 0.25;
+          yHeight = vh * 0.5;
+        } else {
+          yStart = vh * 0.18;
+          yHeight = vh * 0.55;
+        }
+
+        const x = Math.random() * xWidth + xStart;
+        const y = Math.random() * yHeight + yStart;
+        div.style.left = x + "px";
+        div.style.top = y + "px";
+
+        div.style.animationDuration = (22 + Math.random() * 12) + "s";
+        div.style.animationDelay = (Math.random() * 10) + "s";
+
+        div.style.backgroundImage = `url('${url}')`;
+
+        photoLayer.appendChild(div);
       }
 
-      let yStart, yHeight;
-      if (vh < 700) {
-        yStart = vh * 0.25;
-        yHeight = vh * 0.5;
-      } else {
-        yStart = vh * 0.18;
-        yHeight = vh * 0.55;
+      // polaroid card (mobile)
+      if (collage) {
+        const card = document.createElement("div");
+        card.className = "polaroid";
+
+        const inner = document.createElement("div");
+        inner.className = "polaroid-photo";
+        inner.style.backgroundImage = `url('${url}')`;
+
+        const cap = document.createElement("div");
+        cap.className = "polaroid-caption";
+        cap.innerHTML = `<span>captured chaos</span><span class="tag">🎞️ 35mm-ish</span>`;
+
+        card.appendChild(inner);
+        card.appendChild(cap);
+        collage.appendChild(card);
       }
-
-      const x = Math.random() * xWidth + xStart;
-      const y = Math.random() * yHeight + yStart;
-      div.style.left = x + "px";
-      div.style.top = y + "px";
-
-      // random animation timing so they don't sync
-      div.style.animationDuration = (22 + Math.random() * 12) + "s";
-      div.style.animationDelay = (Math.random() * 10) + "s";
-
-      div.style.backgroundImage = `url('${url}')`;
-
-      photoLayer.appendChild(div);
     }
 
     async function loadPhotos() {
