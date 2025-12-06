@@ -318,7 +318,7 @@
       .layout {
         align-items: flex-start;
         min-height: calc(100vh - 140px);
-        padding-bottom: 100px; /* more room for ribbon + button */
+        padding-bottom: 110px; /* more room for ribbon + button */
       }
       .text-panel {
         max-width: 100%;
@@ -327,7 +327,7 @@
       .sub { font-size: 13px; }
       .frame-text { font-size: 12px; }
       .upload-btn {
-        bottom: 80px;
+        bottom: 96px;
         left: 12px;
         font-size: 12px;
         padding: 6px 12px;
@@ -336,6 +336,9 @@
         width: 18px;
         height: 18px;
         font-size: 14px;
+      }
+      .ribbon-wrapper {
+        bottom: 34px; /* lift ribbon above browser chrome */
       }
     }
   </style>
@@ -540,8 +543,27 @@
       const vw = window.innerWidth;
       const vh = window.innerHeight;
 
-      const x = Math.random() * vw * 0.7 + vw * 0.25; // mostly right side
-      const y = Math.random() * vh * 0.6 + vh * 0.05;
+      // Desktop: mostly right side; Mobile: more centered
+      let xStart, xWidth;
+      if (vw < 720) {
+        xStart = vw * 0.05;
+        xWidth = vw * 0.9;
+      } else {
+        xStart = vw * 0.25;
+        xWidth = vw * 0.7;
+      }
+
+      let yStart, yHeight;
+      if (vh < 700) {
+        yStart = vh * 0.18;
+        yHeight = vh * 0.5;
+      } else {
+        yStart = vh * 0.1;
+        yHeight = vh * 0.6;
+      }
+
+      const x = Math.random() * xWidth + xStart;
+      const y = Math.random() * yHeight + yStart;
       div.style.left = x + "px";
       div.style.top = y + "px";
 
