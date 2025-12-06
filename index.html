@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>For You 📷</title>
+  <title>For You 🎄📷</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     * {
@@ -14,7 +14,7 @@
 
     body {
       min-height: 100vh;
-      background: radial-gradient(circle at top, #1f2937, #020617);
+      background: radial-gradient(circle at top, #111827, #020617);
       color: #f9fafb;
       display: flex;
       align-items: center;
@@ -25,12 +25,37 @@
     .card {
       max-width: 480px;
       width: 100%;
-      border-radius: 20px;
-      background: rgba(15, 23, 42, 0.9);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+      border-radius: 22px;
+      background: rgba(15, 23, 42, 0.92);
+      box-shadow: 0 22px 55px rgba(0, 0, 0, 0.8);
       padding: 24px 22px 26px;
-      border: 1px solid rgba(148, 163, 184, 0.5);
-      backdrop-filter: blur(14px);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      backdrop-filter: blur(16px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glow {
+      position: absolute;
+      inset: -40%;
+      opacity: 0.55;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(244, 63, 94, 0.18), transparent 55%),
+        radial-gradient(circle at 100% 0%, rgba(56, 189, 248, 0.2), transparent 55%),
+        radial-gradient(circle at 50% 120%, rgba(52, 211, 153, 0.18), transparent 55%);
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .content {
+      position: relative;
+    }
+
+    .badge-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
     }
 
     .badge {
@@ -39,21 +64,33 @@
       gap: 6px;
       font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.09em;
       color: #e5e7eb;
-      background: rgba(31, 41, 55, 0.9);
-      padding: 5px 9px;
+      background: rgba(15, 23, 42, 0.9);
+      padding: 5px 10px;
       border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.6);
-      margin-bottom: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.8);
     }
 
     .badge-dot {
       width: 7px;
       height: 7px;
-      border-radius: 50%;
+      border-radius: 999px;
       background: #22c55e;
-      box-shadow: 0 0 12px rgba(34, 197, 94, 0.8);
+      box-shadow: 0 0 14px rgba(34, 197, 94, 1);
+    }
+
+    .badge-small {
+      font-size: 10px;
+      color: #9ca3af;
+      opacity: 0.9;
+    }
+
+    .highlight {
+      background: linear-gradient(90deg, #f97316, #fb923c);
+      -webkit-background-clip: text;
+      color: transparent;
+      font-weight: 700;
     }
 
     h1 {
@@ -65,27 +102,36 @@
     .sub {
       font-size: 13px;
       color: #9ca3af;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
-    .photo-frame {
+    .frame {
       position: relative;
-      border-radius: 16px;
+      border-radius: 18px;
       overflow: hidden;
       margin-bottom: 16px;
-      border: 1px solid rgba(148, 163, 184, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.7);
       aspect-ratio: 4 / 3;
-      background: #020617;
+      background: radial-gradient(circle at top, #020617, #020617);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .photo-frame-text {
-      font-size: 13px;
-      color: #9ca3af;
+    .frame-inner {
       text-align: center;
-      padding: 0 16px;
+      padding: 0 18px;
+    }
+
+    .frame-title {
+      font-size: 13px;
+      color: #e5e7eb;
+      margin-bottom: 4px;
+    }
+
+    .frame-text {
+      font-size: 12px;
+      color: #9ca3af;
     }
 
     .tags {
@@ -98,10 +144,10 @@
 
     .tag {
       font-size: 11px;
-      padding: 4px 8px;
+      padding: 4px 9px;
       border-radius: 999px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(55, 65, 81, 0.95);
       color: #e5e7eb;
     }
 
@@ -109,7 +155,11 @@
       font-size: 13px;
       color: #e5e7eb;
       line-height: 1.5;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
+    }
+
+    .message + .message {
+      margin-top: 4px;
     }
 
     .footer {
@@ -118,11 +168,15 @@
       align-items: baseline;
       font-size: 11px;
       color: #6b7280;
-      margin-top: 4px;
+      margin-top: 8px;
     }
 
     .footer span.highlight {
       color: #f97316;
+    }
+
+    .footer span.name {
+      color: #c4b5fd;
     }
 
     @media (max-width: 480px) {
@@ -137,44 +191,52 @@
 </head>
 <body>
   <div class="card">
-    <div class="badge">
-      <span class="badge-dot"></span>
-      <span>To my favourite photographer</span>
-    </div>
+    <div class="glow"></div>
+    <div class="content">
 
-    <h1>Hey, this is your little<br>internet corner.</h1>
-    <p class="sub">
-      Tap the NFC again any time you need a reminder of how ridiculously cool you are.
-    </p>
+      <div class="badge-row">
+        <div class="badge">
+          <span class="badge-dot"></span>
+          <span>For The Designated Photographer</span>
+        </div>
+        <span class="badge-small">xmas edition 🎄</span>
+      </div>
 
-    <div class="photo-frame">
-      <!-- Replace this with an actual img tag later if you want -->
-      <p class="photo-frame-text">
-        Gallery placeholder – you can drop your favourite shot here, or a collage of us.
+      <h1><span class="highlight">Hey, this is your little<br>internet corner.</span></h1>
+
+      <p class="sub">
+        You tapped a Christmas gift. Of course yours had to be slightly extra and a bit
+        nerdy. Wouldn’t be you otherwise.
       </p>
-    </div>
 
-    <div class="tags">
-      <div class="tag">independent</div>
-      <div class="tag">pop culture</div>
-      <div class="tag">shutter soul</div>
-      <div class="tag">main character energy</div>
-    </div>
+      <div class="frame">
+        <div class="frame-inner">
+          <p class="frame-title">Future gallery goes here.</p>
+          <p class="frame-text">
+            One day, this can be your favourite shots, your projects, or chaos from your
+            camera roll. For now, it’s a placeholder for everything you’re going to create.
+          </p>
+        </div>
+      </div>
 
-    <p class="message">
-      This link lives inside an NFC chip because a normal card felt too boring for you.
-      You make everything around you look cinematic, so you deserve a tiny cinematic
-      universe of your own on the internet.
-    </p>
+      <div class="tags">
+        <div class="tag">independent</div>
+        <div class="tag">pop culture brain💅</div>
+        <div class="tag">main character energy</div>
+        <div class="tag">cinematic eye</div>
+      </div>
 
-    <p class="message">
-      Keep creating, keep being loud about what you love, and don't ever dial down
-      your weird just to make anyone comfortable. The world looks better through your lens.
-    </p>
+      <p class="message">
+        This little link-in-a-chip is just my way of saying: keep creating, stay loud
+        about what you love, and don’t ever water yourself down. The world genuinely
+        looks better through your lens.
+      </p>
 
-    <div class="footer">
-      <span>Made for you • <span class="highlight">by me</span></span>
-      <span>tap to come back ✨</span>
+      <div class="footer">
+        <span>Made with mild non-chalant love • <span class="highlight">and a lot of respect</span></span>
+        <span class="name">– you know who 😌</span>
+      </div>
+
     </div>
   </div>
 </body>
