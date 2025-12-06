@@ -49,7 +49,7 @@
       min-height: calc(100vh - 120px);
       position: relative;
       z-index: 2;
-      padding-bottom: 80px; /* room for ribbon on desktop */
+      padding-bottom: 80px;
     }
 
     .text-panel {
@@ -110,26 +110,6 @@
       margin-bottom: 20px;
     }
 
-    .frame {
-      border-radius: 20px;
-      padding: 16px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      margin-bottom: 18px;
-    }
-
-    .frame-title {
-      color: #ffdfaa;
-      font-weight: 600;
-      margin-bottom: 6px;
-      font-size: 13px;
-    }
-
-    .frame-text {
-      font-size: 13px;
-      opacity: 0.82;
-    }
-
     .tag {
       display: inline-block;
       padding: 6px 10px;
@@ -159,7 +139,7 @@
       border-radius: 14px;
       font-size: 14px;
       cursor: pointer;
-      margin-bottom: 16px;
+      margin-bottom: 22px;
       box-shadow: 0 0 10px #ff6b6b88;
       transition: 0.2s;
     }
@@ -181,11 +161,11 @@
 
     .santa-ribbon {
       width: 100%;
-      height: 6px; /* super thin */
+      height: 6px;
       background: radial-gradient(circle at top, #ff6b6b 0%, #ffb55a 40%, #1f2933 100%);
       border-radius: 999px;
       position: relative;
-      overflow: visible; /* don't clip Santa */
+      overflow: visible;
       border: 1px solid rgba(255, 255, 255, 0.18);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
     }
@@ -202,7 +182,7 @@
 
     #santa {
       position: absolute;
-      top: -22px;  /* clearly above ribbon */
+      top: -22px;
       left: 0%;
       width: 54px;
       height: auto;
@@ -233,55 +213,52 @@
       z-index: 2;
     }
 
-    /* photo area – right stack on desktop, strip on mobile */
+    /* floating photo layer */
     #photo-layer {
       position: fixed;
-      top: 100px;
-      right: 16px;
-      bottom: 80px;
-      width: min(260px, 40vw);
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      overflow-y: auto;
-      overflow-x: hidden;
-      gap: 12px;
-      padding-right: 4px;
-      pointer-events: auto;
-      z-index: 1;  /* behind main text but above snow */
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
     }
 
     .photo-frame {
+      position: absolute;
       border-radius: 18px;
       background-size: cover;
       background-position: center;
       border: 1px solid rgba(255, 255, 255, 0.2);
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.65);
       opacity: 0.95;
-      cursor: pointer;
-      transition: transform 0.16s ease, box-shadow 0.16s ease;
+      cursor: default;
+      pointer-events: auto;
+      /* soft float / bounce */
+      animation-name: driftSoft;
+      animation-timing-function: ease-in-out;
+      animation-iteration-count: infinite;
+      animation-direction: alternate;
     }
 
-    .photo-frame:hover {
-      transform: scale(1.06);
-      box-shadow: 0 18px 40px rgba(0,0,0,0.95);
-      z-index: 2;
+    @keyframes driftSoft {
+      0%   { transform: translate3d(0, 0, 0) rotate(-3deg) scale(1); }
+      25%  { transform: translate3d(10px, -12px, 0) rotate(1deg)  scale(1.03); }
+      50%  { transform: translate3d(0, -6px, 0)  rotate(3deg)  scale(1.01); }
+      75%  { transform: translate3d(-10px, 4px, 0) rotate(0deg) scale(1.02); }
+      100% { transform: translate3d(3px, 0, 0)  rotate(-2deg) scale(1); }
     }
 
-    /* sizes */
-    .size-sm { width: 120px; height: 120px; }
+    .size-sm { width: 110px; height: 110px; }
     .size-md { width: 170px; height: 170px; }
-    .size-lg { width: 230px; height: 230px; }
+    .size-lg { width: 240px; height: 240px; }
 
-    /* upload button – top right */
+    /* upload button – top right on mobile/desktop */
     .upload-btn {
       position: fixed;
-      top: 18px;
-      right: 18px;
-      z-index: 5;
-      background: rgba(15, 23, 42, 0.92);
+      top: 14px;
+      right: 16px;
+      z-index: 4;
+      background: rgba(15, 23, 42, 0.96);
       border-radius: 999px;
-      padding: 7px 13px;
+      padding: 8px 14px;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -309,51 +286,27 @@
       .layout {
         align-items: flex-start;
         min-height: calc(100vh - 140px);
-        padding-bottom: 110px; /* more room for ribbon */
+        padding-bottom: 110px;
       }
       .text-panel {
         max-width: 100%;
       }
       h1 { font-size: 24px; }
       .sub { font-size: 13px; }
-      .frame-text { font-size: 12px; }
-
-      /* photo strip at bottom, horizontal scroll, no overlap */
-      #photo-layer {
-        position: fixed;
-        left: 0;
-        right: 0;
-        bottom: 110px;
-        top: auto;
-        height: 140px;
-        width: 100%;
-        flex-direction: row;
-        align-items: center;
-        justify-content: flex-start;
-        overflow-x: auto;
-        overflow-y: hidden;
-        padding: 0 16px;
-        gap: 12px;
-      }
-
-      .photo-frame {
-        flex-shrink: 0;
-      }
-
+      .footer { font-size: 11px; }
       .upload-btn {
-        top: 14px;
-        right: 12px;
+        top: 10px;
+        right: 10px;
         font-size: 12px;
-        padding: 6px 11px;
+        padding: 6px 12px;
       }
       .upload-btn span.icon {
         width: 18px;
         height: 18px;
         font-size: 14px;
       }
-
       .ribbon-wrapper {
-        bottom: 34px; /* lift ribbon above browser chrome */
+        bottom: 34px;
       }
     }
   </style>
@@ -372,7 +325,7 @@
     }
   </script>
 
-  <!-- photos -->
+  <!-- floating photos -->
   <div id="photo-layer"></div>
 
   <!-- main layout -->
@@ -397,14 +350,6 @@
       <!-- hidden YouTube player -->
       <div style="width:100%; height:0; overflow:hidden;">
         <div id="ytplayer"></div>
-      </div>
-
-      <div class="frame">
-        <p class="frame-title">Future gallery goes here.</p>
-        <p class="frame-text">
-          One day, this will be your favourite shots or your chaos. Today, it’s just a small corner of the internet
-          reserved for you.
-        </p>
       </div>
 
       <div>
@@ -534,7 +479,7 @@
       }
     }, 180);
 
-    // ---------- Supabase + photos ----------
+    // ---------- Supabase + floating photos ----------
     const SUPABASE_URL = "https://npohhprkgsxudoucaooy.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wb2hocHJrZ3N4dWRvdWNhb295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwNDU2NjAsImV4cCI6MjA4MDYyMTY2MH0.U_TEDQaXfgFlz0Or_3fiIDavFuTKC9mfn0sVcPNqFr4";
     const BUCKET = "xmas-photos";
@@ -551,6 +496,37 @@
 
       const sizes = ["size-sm", "size-md", "size-lg"];
       div.classList.add(sizes[Math.floor(Math.random() * sizes.length)]);
+
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      // Desktop: mostly right side; Mobile: more spread
+      let xStart, xWidth;
+      if (vw < 720) {
+        xStart = vw * 0.05;
+        xWidth = vw * 0.9;
+      } else {
+        xStart = vw * 0.25;
+        xWidth = vw * 0.7;
+      }
+
+      let yStart, yHeight;
+      if (vh < 700) {
+        yStart = vh * 0.25;
+        yHeight = vh * 0.5;
+      } else {
+        yStart = vh * 0.18;
+        yHeight = vh * 0.55;
+      }
+
+      const x = Math.random() * xWidth + xStart;
+      const y = Math.random() * yHeight + yStart;
+      div.style.left = x + "px";
+      div.style.top = y + "px";
+
+      // random animation timing so they don't sync
+      div.style.animationDuration = (22 + Math.random() * 12) + "s";
+      div.style.animationDelay = (Math.random() * 10) + "s";
 
       div.style.backgroundImage = `url('${url}')`;
 
