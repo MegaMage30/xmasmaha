@@ -233,54 +233,48 @@
       z-index: 2;
     }
 
-    /* floating photo layer */
+    /* photo column – no rotation, scrollable, overlaps slightly */
     #photo-layer {
       position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 1;
+      top: 90px;
+      right: 10px;
+      bottom: 90px;
+      width: min(260px, 40vw);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      overflow-y: auto;
+      overflow-x: visible;
+      gap: 0;
+      padding-right: 4px;
+      pointer-events: auto;
+      z-index: 1;  /* behind main text but above snow */
     }
 
     .photo-frame {
-      position: absolute;
+      position: relative;
       border-radius: 18px;
       background-size: cover;
       background-position: center;
       border: 1px solid rgba(255, 255, 255, 0.2);
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.65);
-      opacity: 0.9;
+      opacity: 0.95;
       cursor: pointer;
-      pointer-events: auto;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      margin-bottom: -40px; /* overlap stack */
+      transform: translateX(0);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
 
     .photo-frame:hover {
-      transform: scale(1.06);
-      box-shadow: 0 16px 35px rgba(0,0,0,0.85);
-      z-index: 4;
+      transform: translateX(-6px);
+      box-shadow: 0 16px 35px rgba(0,0,0,0.9);
+      z-index: 2;
     }
 
     /* enlarged sizes */
     .size-sm { width: 110px; height: 110px; }
     .size-md { width: 170px; height: 170px; }
     .size-lg { width: 240px; height: 240px; }
-
-    @keyframes driftA {
-      0% { transform: translate(0, 0); }
-      100% { transform: translate(40px, -60px); }
-    }
-    @keyframes driftB {
-      0% { transform: translate(0, 0); }
-      100% { transform: translate(-40px, 60px); }
-    }
-    @keyframes orbit {
-      0% { transform: translate(-20px, -20px) rotate(0deg); }
-      100% { transform: translate(20px, 20px) rotate(360deg); }
-    }
-
-    .motion-driftA { animation: driftA 26s linear infinite alternate; }
-    .motion-driftB { animation: driftB 28s linear infinite alternate; }
-    .motion-orbit  { animation: orbit 34s linear infinite alternate; }
 
     /* upload button bottom-left */
     .upload-btn {
@@ -326,6 +320,30 @@
       h1 { font-size: 24px; }
       .sub { font-size: 13px; }
       .frame-text { font-size: 12px; }
+
+      /* photo strip at bottom with horizontal scroll, overlapping */
+      #photo-layer {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 110px;
+        top: auto;
+        height: 150px;
+        width: 100%;
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: flex-start;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 0 16px;
+        gap: 0;
+      }
+
+      .photo-frame {
+        margin-bottom: 0;
+        margin-right: -36px; /* sideways overlap */
+      }
+
       .upload-btn {
         bottom: 96px;
         left: 12px;
@@ -357,7 +375,7 @@
     }
   </script>
 
-  <!-- floating photos -->
+  <!-- stacked / scrolling photos -->
   <div id="photo-layer"></div>
 
   <!-- main layout -->
@@ -519,7 +537,7 @@
       }
     }, 180);
 
-    // ---------- Supabase + floating photos ----------
+    // ---------- Supabase + stacked / scrolling photos ----------
     const SUPABASE_URL = "https://npohhprkgsxudoucaooy.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wb2hocHJrZ3N4dWRvdWNhb295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwNDU2NjAsImV4cCI6MjA4MDYyMTY2MH0.U_TEDQaXfgFlz0Or_3fiIDavFuTKC9mfn0sVcPNqFr4";
     const BUCKET = "xmas-photos";
@@ -535,37 +553,7 @@
       div.classList.add("photo-frame");
 
       const sizes = ["size-sm", "size-md", "size-lg"];
-      const motions = ["motion-driftA", "motion-driftB", "motion-orbit"];
-
       div.classList.add(sizes[Math.floor(Math.random() * sizes.length)]);
-      div.classList.add(motions[Math.floor(Math.random() * motions.length)]);
-
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-
-      // Desktop: mostly right side; Mobile: more centered
-      let xStart, xWidth;
-      if (vw < 720) {
-        xStart = vw * 0.05;
-        xWidth = vw * 0.9;
-      } else {
-        xStart = vw * 0.25;
-        xWidth = vw * 0.7;
-      }
-
-      let yStart, yHeight;
-      if (vh < 700) {
-        yStart = vh * 0.18;
-        yHeight = vh * 0.5;
-      } else {
-        yStart = vh * 0.1;
-        yHeight = vh * 0.6;
-      }
-
-      const x = Math.random() * xWidth + xStart;
-      const y = Math.random() * yHeight + yStart;
-      div.style.left = x + "px";
-      div.style.top = y + "px";
 
       div.style.backgroundImage = `url('${url}')`;
 
