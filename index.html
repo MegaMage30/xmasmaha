@@ -167,7 +167,7 @@
       transform: translateY(-1px);
     }
 
-    /* curved ribbon progress bar bottom center */
+    /* curved ribbon progress bar bottom center – thinner */
     .ribbon-wrapper {
       position: fixed;
       left: 50%;
@@ -180,7 +180,7 @@
 
     .santa-ribbon {
       width: 100%;
-      height: 24px;
+      height: 14px; /* thinner */
       background: radial-gradient(circle at top, #ff6b6b 0%, #ffb55a 40%, #1f2933 100%);
       border-radius: 999px;
       position: relative;
@@ -194,16 +194,16 @@
       inset: 0;
       width: 0%;
       background: linear-gradient(90deg, #ffe0b3, #ffad60);
-      opacity: 0.25;
+      opacity: 0.35;
       border-radius: 999px;
       transition: width 0.12s linear;
     }
 
     #santa {
       position: absolute;
-      top: -26px;
+      top: -18px;
       left: 0%;
-      width: 70px;
+      width: 60px;
       height: auto;
       animation: float 2.2s ease-in-out infinite;
       pointer-events: none;
@@ -211,7 +211,7 @@
 
     @keyframes float {
       0% { transform: translateY(0px); }
-      50% { transform: translateY(-7px); }
+      50% { transform: translateY(-5px); }
       100% { transform: translateY(0px); }
     }
 
@@ -313,7 +313,6 @@
   </style>
 </head>
 <body>
-
   <!-- snowflakes -->
   <script>
     for (let i = 0; i < 36; i++) {
@@ -384,56 +383,82 @@
     </div>
   </div>
 
-  <!-- upload button -->
+  <!-- upload button + hidden input -->
   <button class="upload-btn" id="uploadBtn">
     <span class="icon">+</span>
     <span>Add photo</span>
   </button>
   <input id="photoInput" type="file" accept="image/*" multiple style="display:none;" />
 
-  <!-- scripts: YouTube + Supabase + gallery -->
-  <script type="module">
-    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/esm/supabase.js";
+  <!-- Supabase UMD -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <!-- YouTube Iframe API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
 
-    const SUPABASE_URL = "https://npohhprkgsxudoucaooy.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wb2hocHJrZ3N4dWRvdWNhb295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwNDU2NjAsImV4cCI6MjA4MDYyMTY2MH0.U_TEDQaXfgFlz0Or_3fiIDavFuTKC9mfn0sVcPNqFr4";
-    const BUCKET = "xmas-photos"; // make sure this bucket exists & is public
-
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <script>
+    // ---------- YouTube player ----------
+    let player;
+    let playing = false;
 
     const playBtn = document.getElementById("playBtn");
     const progressFill = document.getElementById("progressFill");
     const santa = document.getElementById("santa");
-    const photoLayer = document.getElementById("photo-layer");
-    const uploadBtn = document.getElementById("uploadBtn");
-    const photoInput = document.getElementById("photoInput");
 
-    let player;
-    let playing = false;
-
-    // load YouTube IFrame API
-    const ytScript = document.createElement("script");
-    ytScript.src = "https://www.youtube.com/iframe_api";
-    document.head.appendChild(ytScript);
-
-    window.onYouTubeIframeAPIReady = () => {
+    function onYouTubeIframeAPIReady() {
       player = new YT.Player("ytplayer", {
         height: "0",
         width: "0",
         videoId: "NdYWuo9OFAw",
         playerVars: {
-          autoplay: 0,
+          autoplay: 0,      // user-triggered
           controls: 0,
           playsinline: 1
+        },
+        events: {
+          onReady: onPlayerReady,
+          onStateChange: onPlayerStateChange
         }
       });
-    };
+    }
 
-    // play / pause
+    function onPlayerReady() {
+      player.pauseVideo();
+      player.setVolume(100);
+      playing = false;
+      playBtn.textContent = "▶ Play Iris";
+    }
+
+    function onPlayerStateChange(event) {
+      if (event.data === YT.PlayerState.PLAYING) {
+        playing = true;
+        playBtn.textContent = "⏸ Pause Iris";
+      } else {
+        playing = false;
+        playBtn.textContent = "▶ Play Iris";
+      }
+    }
+
+    // Smooth fade-in from 0 → 100 volume
+    function fadeInVolume() {
+      player.setVolume(0);
+      let vol = 0;
+
+      const fadeInterval = setInterval(() => {
+        if (vol < 100) {
+          vol += 4;
+          player.setVolume(vol);
+        } else {
+          clearInterval(fadeInterval);
+        }
+      }, 60);
+    }
+
     playBtn.addEventListener("click", () => {
       if (!player) return;
+
       if (!playing) {
         player.playVideo();
+        fadeInVolume();
         playing = true;
         playBtn.textContent = "⏸ Pause Iris";
       } else {
@@ -443,7 +468,6 @@
       }
     });
 
-    // sparkles behind santa
     function spawnSparkle(x, y) {
       const sp = document.createElement("div");
       sp.className = "spark";
@@ -453,7 +477,6 @@
       setTimeout(() => sp.remove(), 600);
     }
 
-    // update progress + santa position
     setInterval(() => {
       if (player && typeof player.getDuration === "function") {
         const total = player.getDuration();
@@ -462,28 +485,37 @@
           const percent = (current / total) * 100;
           progressFill.style.width = percent + "%";
           santa.style.left = percent + "%";
-
           const rect = santa.getBoundingClientRect();
-          spawnSparkle(rect.left - 8, rect.top + rect.height * 0.7);
+          spawnSparkle(rect.left - 6, rect.top + rect.height * 0.7);
         }
       }
     }, 180);
 
-    // floating photo frames
+    // ---------- Supabase + floating photos ----------
+    const SUPABASE_URL = "https://npohhprkgsxudoucaooy.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wb2hocHJrZ3N4dWRvdWNhb295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwNDU2NjAsImV4cCI6MjA4MDYyMTY2MH0.U_TEDQaXfgFlz0Or_3fiIDavFuTKC9mfn0sVcPNqFr4";
+    const BUCKET = "xmas-photos";
+
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const photoLayer = document.getElementById("photo-layer");
+    const uploadBtn = document.getElementById("uploadBtn");
+    const photoInput = document.getElementById("photoInput");
+
     function addPhotoFrame(url) {
       const div = document.createElement("div");
       div.classList.add("photo-frame");
 
-      const sizeClasses = ["size-sm", "size-md", "size-lg"];
-      const motionClasses = ["motion-driftA", "motion-driftB", "motion-orbit"];
+      const sizes = ["size-sm", "size-md", "size-lg"];
+      const motions = ["motion-driftA", "motion-driftB", "motion-orbit"];
 
-      div.classList.add(sizeClasses[Math.floor(Math.random() * sizeClasses.length)]);
-      div.classList.add(motionClasses[Math.floor(Math.random() * motionClasses.length)]);
+      div.classList.add(sizes[Math.floor(Math.random() * sizes.length)]);
+      div.classList.add(motions[Math.floor(Math.random() * motions.length)]);
 
       const vw = window.innerWidth;
       const vh = window.innerHeight;
 
-      const x = Math.random() * vw * 0.8 + vw * 0.15; // mostly right / mid
+      const x = Math.random() * vw * 0.7 + vw * 0.25; // mostly right side
       const y = Math.random() * vh * 0.6 + vh * 0.05;
       div.style.left = x + "px";
       div.style.top = y + "px";
@@ -495,7 +527,7 @@
 
     async function loadPhotos() {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
           .storage
           .from(BUCKET)
           .list("photos", { limit: 40, sortBy: { column: "created_at", order: "asc" } });
@@ -504,18 +536,17 @@
 
         data.forEach(item => {
           const path = `photos/${item.name}`;
-          const { data: urlData } = supabase
+          const { data: urlData } = supabaseClient
             .storage
             .from(BUCKET)
             .getPublicUrl(path);
-          if (urlData?.publicUrl) addPhotoFrame(urlData.publicUrl);
+          if (urlData && urlData.publicUrl) addPhotoFrame(urlData.publicUrl);
         });
       } catch (e) {
         console.log("Error loading photos", e);
       }
     }
 
-    // upload flow
     uploadBtn.addEventListener("click", () => {
       photoInput.click();
     });
@@ -525,10 +556,12 @@
       for (const file of files) {
         const safeName = file.name.replace(/[^a-z0-9.\-_]/gi, "_").toLowerCase();
         const path = `photos/${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safeName}`;
-        const { error } = await supabase.storage.from(BUCKET).upload(path, file);
+        const { error } = await supabaseClient.storage.from(BUCKET).upload(path, file);
         if (!error) {
-          const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(path);
-          if (urlData?.publicUrl) addPhotoFrame(urlData.publicUrl);
+          const { data: urlData } = supabaseClient.storage.from(BUCKET).getPublicUrl(path);
+          if (urlData && urlData.publicUrl) addPhotoFrame(urlData.publicUrl);
+        } else {
+          console.log("Upload error", error);
         }
       }
       photoInput.value = "";
