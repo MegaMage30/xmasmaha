@@ -130,25 +130,59 @@
       gap: 8px;
     }
 
-    /* play button */
+    /* play button – starts disabled */
     #playBtn {
-      background: linear-gradient(90deg, #ff4d4d, #ff9344);
-      color: white;
       padding: 10px 18px;
       border: none;
       border-radius: 14px;
       font-size: 14px;
-      cursor: pointer;
-      margin-bottom: 22px;
-      box-shadow: 0 0 10px #ff6b6b88;
+      cursor: default;
+      margin-bottom: 10px;
+      box-shadow: none;
+      background: rgba(148, 163, 184, 0.35);
+      color: #9ca3af;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       transition: 0.2s;
     }
-    #playBtn:hover {
+    #playBtn.ready {
+      background: linear-gradient(90deg, #ff4d4d, #ff9344);
+      color: #ffffff;
+      box-shadow: 0 0 10px #ff6b6b88;
+      cursor: pointer;
+    }
+    #playBtn.ready:hover {
       box-shadow: 0 0 16px #ff9c6b;
       transform: translateY(-1px);
     }
 
-    /* ribbon progress bar bottom center – ultra thin, non-clipping */
+    /* playlist block */
+    .playlist-block {
+      margin-bottom: 18px;
+      margin-top: 6px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      font-size: 12px;
+      color: #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .playlist-block a {
+      color: #a5b4fc;
+      text-decoration: none;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .playlist-block a:hover {
+      text-decoration: underline;
+    }
+
+    /* ribbon progress bar */
     .ribbon-wrapper {
       position: fixed;
       left: 50%;
@@ -406,7 +440,14 @@
         You tapped a Christmas gift. Slightly extra, definitely nerdy — exactly the energy you deserve.
       </p>
 
-      <button id="playBtn">▶</button>
+      <button id="playBtn">Loading Iris…</button>
+
+      <div class="playlist-block">
+        <span>Want the full vibe on repeat?</span>
+        <a href="https://open.spotify.com/search/iris%20goo%20goo%20dolls" target="_blank" rel="noreferrer">
+          Open playlist
+        </a>
+      </div>
 
       <!-- hidden YouTube player -->
       <div style="width:100%; height:0; overflow:hidden;">
@@ -481,13 +522,14 @@
       player.setVolume(100);
       playing = false;
       playBtn.textContent = "▶ Play Iris";
+      playBtn.classList.add("ready");
     }
 
     function onPlayerStateChange(event) {
       if (event.data === YT.PlayerState.PLAYING) {
         playing = true;
         playBtn.textContent = "⏸ Pause Iris";
-      } else {
+      } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
         playing = false;
         playBtn.textContent = "▶ Play Iris";
       }
@@ -507,7 +549,7 @@
     }
 
     playBtn.addEventListener("click", () => {
-      if (!player) return;
+      if (!playBtn.classList.contains("ready") || !player) return;
       if (!playing) {
         player.playVideo();
         fadeInVolume();
@@ -569,18 +611,15 @@
 
         let xStart, xWidth;
         if (vw < 720) {
-          // not really used (photo-layer hidden on mobile), but keep sane
           xStart = vw * 0.05;
           xWidth = vw * 0.9;
         } else {
-          // right half only, away from text panel
           xStart = vw * 0.55;
           xWidth = vw * 0.4;
         }
 
         let yStart, yHeight;
         if (vh < 700) {
-          // lower half so it doesn't sit under title/tags
           yStart = vh * 0.4;
           yHeight = vh * 0.45;
         } else {
@@ -632,7 +671,10 @@
           return;
         }
 
-        data.forEach(item => {
+        // Skip the very first file (your old placeholder / empty one)
+        const files = data.slice(1);
+
+        files.forEach(item => {
           const path = `photos/${item.name}`;
           const { data: urlData } = supabaseClient
             .storage
