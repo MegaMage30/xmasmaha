@@ -130,7 +130,7 @@
       gap: 8px;
     }
 
-    /* play button – starts disabled */
+    /*button – starts disabled */
     #playBtn {
       padding: 10px 18px;
       border: none;
@@ -440,11 +440,11 @@
         You tapped a Christmas gift. Slightly extra, definitely nerdy — exactly the energy you deserve.
       </p>
 
-      <button id="playBtn">Loading Iris…</button>
+      <button id="playBtn">Loading…</button>
 
       <div class="playlist-block">
         <span>Want the full vibe on repeat?</span>
-        <a href="https://open.spotify.com/search/iris%20goo%20goo%20dolls" target="_blank" rel="noreferrer">
+        <a href="https://open.spotify.com/search/%20goo%20goo%20dolls" target="_blank" rel="noreferrer">
           Open playlist
         </a>
       </div>
@@ -521,17 +521,17 @@
       player.pauseVideo();
       player.setVolume(100);
       playing = false;
-      playBtn.textContent = "▶ Play Iris";
+      playBtn.textContent = "▶";
       playBtn.classList.add("ready");
     }
 
     function onPlayerStateChange(event) {
       if (event.data === YT.PlayerState.PLAYING) {
         playing = true;
-        playBtn.textContent = "⏸ Pause Iris";
+        playBtn.textContent = "⏸";
       } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
         playing = false;
-        playBtn.textContent = "▶ Play Iris";
+        playBtn.textContent = "▶";
       }
     }
 
@@ -554,11 +554,11 @@
         player.playVideo();
         fadeInVolume();
         playing = true;
-        playBtn.textContent = "⏸ Pause Iris";
+        playBtn.textContent = "⏸";
       } else {
         player.pauseVideo();
         playing = false;
-        playBtn.textContent = "▶ Play Iris";
+        playBtn.textContent = "▶";
       }
     });
 
