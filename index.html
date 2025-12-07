@@ -230,7 +230,6 @@
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.65);
       opacity: 0.95;
       pointer-events: auto;
-      /* soft float / bounce */
       animation-name: driftSoft;
       animation-timing-function: ease-in-out;
       animation-iteration-count: infinite;
@@ -253,7 +252,7 @@
     .collage {
       max-width: 480px;
       margin-top: 26px;
-      display: none; /* desktop default */
+      display: none;
     }
 
     .polaroid {
@@ -294,7 +293,6 @@
       color: #111827cc;
     }
 
-    /* slight random-ish tilts using nth-child for collage */
     .collage .polaroid:nth-child(3n+1) { transform: rotate(-3deg) translateX(-4px); }
     .collage .polaroid:nth-child(3n+2) { transform: rotate(2.5deg) translateX(6px); }
     .collage .polaroid:nth-child(3n)   { transform: rotate(-1.5deg) translateX(-2px); }
@@ -344,7 +342,6 @@
       .sub { font-size: 13px; }
       .footer { font-size: 11px; }
 
-      /* hide floating layer on mobile, show collage */
       #photo-layer {
         display: none;
       }
@@ -572,20 +569,23 @@
 
         let xStart, xWidth;
         if (vw < 720) {
+          // not really used (photo-layer hidden on mobile), but keep sane
           xStart = vw * 0.05;
           xWidth = vw * 0.9;
         } else {
-          xStart = vw * 0.25;
-          xWidth = vw * 0.7;
+          // right half only, away from text panel
+          xStart = vw * 0.55;
+          xWidth = vw * 0.4;
         }
 
         let yStart, yHeight;
         if (vh < 700) {
-          yStart = vh * 0.25;
-          yHeight = vh * 0.5;
+          // lower half so it doesn't sit under title/tags
+          yStart = vh * 0.4;
+          yHeight = vh * 0.45;
         } else {
-          yStart = vh * 0.18;
-          yHeight = vh * 0.55;
+          yStart = vh * 0.35;
+          yHeight = vh * 0.5;
         }
 
         const x = Math.random() * xWidth + xStart;
